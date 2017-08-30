@@ -10,11 +10,13 @@ This is a simple tool to generate vBF2 style info images for your customized lev
 
 [Python 2.7.13](https://www.python.org/downloads/release/python-2713/)  
 [Pillow](https://github.com/python-pillow/Pillow)  
+[nvdxt.exe in NVIDIA DDS Utilities](https://developer.nvidia.com/legacy-texture-tools)
 
 # Install  
 
 1.Install [python 2.7.13](https://www.python.org/downloads/release/python-2713/) first. After installing python, you can run install_pillow.bat to install pillow via pip.
-2.Unzip the folder infomap into your mod's python folder. Note that this tool is not loaded in game, so after infomap generation you can delete the folder.
+2.Unzip the folder infomap into your mod's python folder. Note that this tool is not loaded in game, so after infomap generation you can delete the folder. 
+3.Copy nvdxt.exe to bin folder.
 
 # Usage  
 
