@@ -1,4 +1,4 @@
-#vBF2 style info map generater v1.0
+#vBF2 style info map generater v1.1
 #by worldlife
 
 import sys, os, math
@@ -14,11 +14,17 @@ MAPPATH_FLAGS = "maps\\flags"
 MAPPATH_FLAGS_CP_IMGNAME = "miniMap_CP.tga"
 MAPPATH_FLAGS_CPBASE_IMGNAME = "utct.tga"#"miniMap_CPBase.tga"
 OUTPUT_SIZE = (1024,1024)
+
+DRAW_COVER = True
+
+DRAW_MINIMAP = True
 MINIMAP_POSITION = (820,820)
 MINIMAP_SIZE = (166,166)
 MINIMAP_LINEWIDTH = 5
 MINIMAP_BORDER_COLOR = (255,255,255,255)
 MINIMAP_BOUNDINGBOX_COLOR = (255,0,0,255)
+
+DRAW_PROJECTION_EFFECT = True
 PROJECTION_VECTOR = (-6,6)
 PROJECTION_BLUR = 3
 PROJECTION_SHADOWCOLOR = (20,20,20,225)
@@ -45,6 +51,7 @@ class ControlPointInfo:
 		self.layer = 1
 		self.AB = ''
 		self.utct = 0
+		self.showOnMinimap = 1
 		self.position = (0,0,0)#'0/0/0'
 		self.rotation = (0,0,0)#'0/0/0'
 
@@ -80,6 +87,9 @@ def findGPOInfo(cons):
 			continue
 		if len(activeCpTemplate) != 0 and con.get('ObjectTemplate.unableToChangeTeam'): 
 			cps[activeCpTemplate].utct = int(con['ObjectTemplate.unableToChangeTeam'][0])
+			continue
+		if len(activeCpTemplate) != 0 and con.get('ObjectTemplate.showOnMinimap'):
+			cps[activeCpTemplate].showOnMinimap = int(con['ObjectTemplate.showOnMinimap'][0])
 			continue
 		if con.get('ObjectTemplate.create'):
 			if con['ObjectTemplate.create'][0] == "ControlPoint":
@@ -225,42 +235,49 @@ def parseCon(levelinfo, gamemode, playernum):
 	#draw controlPoints
 	cpCanvas = Image.new('RGBA', img.size, (255,255,255,0))
 	for cp in cps:
+		if cp.showOnMinimap==0: continue
+		newCanvas = Image.new('RGBA', img.size, (255,255,255,0))
 		drawmap = cpmaps[cp.team] #if cp.utct==0 else cpbasemaps[cp.team]
 		cpPos = convertCoordCropped(cp.position, baseSize, levelinfo.mapsize, caBox)
 		drawPos = (cpPos[0]-drawmap.size[0]/2,cpPos[1]-drawmap.size[1]/2) #draw at center
 		if cp.utct!=0: 
 			drawmap = Image.alpha_composite(cpbasemap,drawmap)#cpCanvas.paste(cpbasemap,drawPos)
-		cpCanvas.paste(drawmap,drawPos)	
+		newCanvas.paste(drawmap,drawPos)	
+		cpCanvas = Image.alpha_composite(cpCanvas, newCanvas)
 	#add projection effect(alt:add in photoshop)
-	shadowCanvas = drawProjectionCanvas(cpCanvas)
-	#img = Image.composite(shadowCanvas, img, shadowalpha)
-	img = Image.alpha_composite(img,shadowCanvas)
+	if DRAW_PROJECTION_EFFECT:
+		shadowCanvas = drawProjectionCanvas(cpCanvas)
+		#img = Image.composite(shadowCanvas, img, shadowalpha)
+		img = Image.alpha_composite(img,shadowCanvas)
 	img = Image.alpha_composite(img,cpCanvas)
 	
 	#draw cover(grid, boarders, decorations, etc.)
-	coverImg = Image.open(MAPPATH_COVER)
-	if coverImg.size != img.size: coverImg = coverImg.resize(img.size,resample=Image.BILINEAR)
-	img = Image.alpha_composite(img,coverImg)
+	if DRAW_COVER:
+		coverImg = Image.open(MAPPATH_COVER)
+		if coverImg.size != img.size: coverImg = coverImg.resize(img.size,resample=Image.BILINEAR)
+		img = Image.alpha_composite(img,coverImg)
 	
 	#draw minimap
 	#prepare minimap and canvas
-	minimap = baseimg.resize(MINIMAP_SIZE,resample=Image.BILINEAR)
-	minimapCanvas = Image.new('RGBA', img.size, (255,255,255,0))
-	dc = ImageDraw.Draw(minimapCanvas)# get a drawing context
-	#draw border
-	borderbox = (MINIMAP_POSITION[0],MINIMAP_POSITION[1],MINIMAP_POSITION[0]+MINIMAP_SIZE[0],MINIMAP_POSITION[1]+MINIMAP_SIZE[1])
-	drawRect(dc, borderbox, MINIMAP_BORDER_COLOR, MINIMAP_LINEWIDTH)
-	#draw combat area bounding box on minimap
-	mndc = ImageDraw.Draw(minimap)
-	miniCABox = [int((coord+0.0)/baseSize*MINIMAP_SIZE[0]) for coord in caBox] #MAY NEED FIX!
-	drawRect(mndc, miniCABox, MINIMAP_BOUNDINGBOX_COLOR, MINIMAP_LINEWIDTH)
-	#draw minimap
-	#dc.bitmap(MINIMAP_POSITION,minimap)
-	minimapCanvas.paste(minimap,MINIMAP_POSITION)
-	#add projection effect
-	shadowCanvas = drawProjectionCanvas(minimapCanvas)
-	img = Image.alpha_composite(img,shadowCanvas)
-	img = Image.alpha_composite(img,minimapCanvas)
+	if DRAW_MINIMAP:
+		minimap = baseimg.resize(MINIMAP_SIZE,resample=Image.BILINEAR)
+		minimapCanvas = Image.new('RGBA', img.size, (255,255,255,0))
+		dc = ImageDraw.Draw(minimapCanvas)# get a drawing context
+		#draw border
+		borderbox = (MINIMAP_POSITION[0],MINIMAP_POSITION[1],MINIMAP_POSITION[0]+MINIMAP_SIZE[0],MINIMAP_POSITION[1]+MINIMAP_SIZE[1])
+		drawRect(dc, borderbox, MINIMAP_BORDER_COLOR, MINIMAP_LINEWIDTH)
+		#draw combat area bounding box on minimap
+		mndc = ImageDraw.Draw(minimap)
+		miniCABox = [int((coord+0.0)/baseSize*MINIMAP_SIZE[0]) for coord in caBox] #MAY NEED FIX!
+		drawRect(mndc, miniCABox, MINIMAP_BOUNDINGBOX_COLOR, MINIMAP_LINEWIDTH)
+		#draw minimap
+		#dc.bitmap(MINIMAP_POSITION,minimap)
+		minimapCanvas.paste(minimap,MINIMAP_POSITION)
+		#add projection effect
+		if DRAW_PROJECTION_EFFECT:
+			shadowCanvas = drawProjectionCanvas(minimapCanvas)
+			img = Image.alpha_composite(img,shadowCanvas)
+		img = Image.alpha_composite(img,minimapCanvas)
 	
 	#save image
 	if gamemode[0:2]=="sp": gamemode="sp1"#all sp use sp1

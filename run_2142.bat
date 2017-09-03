@@ -1,0 +1,2 @@
+python generateInfomaps_2142.py
+pause

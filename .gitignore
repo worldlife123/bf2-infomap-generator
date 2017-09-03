@@ -1,4 +1,5 @@
-.exe
-.pyc
-.txt
 levels/
+*.exe
+*.pyc
+*.txt
+*.psd
