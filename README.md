@@ -1,5 +1,5 @@
 # [bf2-infomap-generator](https://github.com/worldlife123/bf2-infomap-generator)
-vBF2 style & BF2142 style info map generater V1.1 by worldlife(worldlife123)
+vBF2 style & BF2142 style info map generator V1.1 by worldlife(worldlife123)
 
 This is a simple tool to generate vBF2 style and BF2142 style info images for your customized levels.
 
