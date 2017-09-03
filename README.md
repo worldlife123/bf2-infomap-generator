@@ -1,4 +1,4 @@
-# bf2-infomap-generator
+# [bf2-infomap-generator](https://github.com/worldlife123/bf2-infomap-generator)
 vBF2 style & BF2142 style info map generater V1.1 by worldlife(worldlife123)
 
 This is a simple tool to generate vBF2 style and BF2142 style info images for your customized levels.
@@ -8,6 +8,7 @@ This is a simple tool to generate vBF2 style and BF2142 style info images for yo
 
 # Dependencies  
 
+BattleField 2/2142
 [Python 2.7.13](https://www.python.org/downloads/release/python-2713/)  
 [Pillow](https://github.com/python-pillow/Pillow)  
 [nvdxt.exe in NVIDIA DDS Utilities](https://developer.nvidia.com/legacy-texture-tools)
@@ -15,7 +16,7 @@ This is a simple tool to generate vBF2 style and BF2142 style info images for yo
 # Install  
 
 1. Install [python 2.7.13](https://www.python.org/downloads/release/python-2713/) first. After installing python, you can run install_pillow.bat to install pillow via pip.  
-2. Unzip the folder infomap into your mod's python folder. Note that this tool is not loaded in game, so after infomap generation you can delete the folder.   
+2. Create a new folder "infomap" into your mod's python folder, and copy everything into this folder. Note that this tool is not loaded in game, so after infomap generation you can delete the folder.   
 3. Copy nvdxt.exe to bin folder.  
 
 # Usage  
