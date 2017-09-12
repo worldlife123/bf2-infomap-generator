@@ -10,7 +10,7 @@ Current version is V1.1.1.
 
 # Dependencies  
 
-BattleField 2/2142
+BattleField 2/2142  
 [Python 2.7.13](https://www.python.org/downloads/release/python-2713/)  
 [Pillow](https://github.com/python-pillow/Pillow)  
 [nvdxt.exe in NVIDIA DDS Utilities](https://developer.nvidia.com/legacy-texture-tools)
