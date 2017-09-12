@@ -406,28 +406,59 @@ def processLevel(level):
 	else:
 		print("Level %s not valid!" % level)
 		
-def main():
-	hasLevel = False
-	if not os.path.isdir(LEVELS_DIR): print("No Levels folder detected! Check your installation!")
+def getLevelChoice():
+	levelCnt = 0
+
 	for levelname in os.listdir(LEVELS_DIR): 
-		if not hasLevel:
-			hasLevel = True
-			print("Levels detected...")
-		print("--> %s" % levelname)
-	if not hasLevel: 
-		print("No level detected!")
+		levelCnt = (levelCnt + 1);
+		print "<%d> %s" % (levelCnt, levelname);		
+
+	MaxLevelCnt = levelCnt;	
+	print ("<<0>> All listed maps")
+	print("Input the level number you want to generate info maps:")
+	input = raw_input();
+	levelNum = int(input)
+	while ( levelNum < 0 or levelNum > MaxLevelCnt):
+		print("Whoops!  Try again:");
+		input = raw_input();
+		levelNum = int(input);			
+	
+	if (levelNum == 0):
+		return "All";
+		
+	#process the listdir to get the level name
+	levelCnt = 0;
+	for levelname in os.listdir(LEVELS_DIR): 
+		levelCnt = (levelCnt + 1);
+		if (levelCnt == levelNum):
+			processLevel(levelname);
+		
+		
+def main():
+
+	if not os.path.isdir(LEVELS_DIR): 
+		print("No Levels folder detected! Check your installation!")
+		print("Hit any key end")
 		os.system("pause")
-		return
-	print("Input the level name you want to generate info maps(input \"all\" to generate for all levels):")
-	input = raw_input()
+		return False;
+		
+	if not os.listdir(LEVELS_DIR):	
+		print("There are not levels in this directory!")
+		print("Hit any key end")
+		os.system("pause")
+		return False;
+		
+	levelName = getLevelChoice();
+
+	
 	#clear tmp folder
 	for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
-	if input=="all":
+	if levelName=="ALL":
 		for levelname in os.listdir(LEVELS_DIR):
 			processLevel(levelname)
 			for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
-	else:
-		processLevel(input)
+
+
 	os.system("pause")
 	
 if __name__ == "__main__":
