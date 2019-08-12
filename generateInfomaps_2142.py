@@ -9,7 +9,7 @@ LEVELS_DIR = "levels" #for debug purposes
 if not os.path.isdir(LEVELS_DIR): LEVELS_DIR = "..\\..\\levels" #installed in mod directory
 NVDXT_PATH = "bin\\nvdxt.exe"
 MAPPATH_COMBATAREA = "maps\\areas_2142\\CombatArea.dds"
-MAPPATH_COVER = "maps\\areas_2142\\cover.dds"
+MAPPATH_COVER = "maps\\areas_2142\\cover.png"
 MAPPATH_FLAGS = "maps\\flags_2142"
 MAPPATH_FLAGS_CP_IMGNAME = "miniMap_CP.tga"
 MAPPATH_FLAGS_CPBASE_IMGNAME = "miniMap_CPBase.tga"
@@ -180,11 +180,20 @@ def findGPOInfo(cons):
 			continue
 	objspwinfo = [objspws[osname] for osname in objspws]
 	cpinfo = [cps[cpname] for cpname in cps]
+	
 	combatareaPoints = []
+	combatareaPointsSecondary = []
 	for caName in combatAreas:
-		if len(combatAreas[caName].points)>0 and combatAreas[caName].team==0 and combatAreas[caName].vehicles==4: #only use vBF2 style combatArea
-			combatareaPoints = combatAreas[caName].points
-			break
+		if len(combatAreas[caName].points)>0 and combatAreas[caName].team==0: #only use vBF2 style combatArea
+			if combatAreas[caName].vehicles==4: 
+				combatareaPoints.append(combatAreas[caName].points)
+			else:
+				combatareaPointsSecondary.append(combatAreas[caName].points)
+	if len(combatareaPoints) > 0:
+		combatareaPoints = combatareaPoints[0] # TODO: maybe we can combine all valid CAs
+	elif len(combatareaPointsSecondary) > 0:
+		combatareaPoints = combatareaPointsSecondary[0]
+
 	return objspwinfo, cpinfo, combatareaPoints
 
 #convert and open dds which is not in dxt* format and cannot be opened by pillow	
@@ -422,7 +431,9 @@ def main():
 		return
 	print("Input the level name you want to generate info maps(input \"all\" to generate for all levels):")
 	input = raw_input()
-	#clear tmp folder
+	# create tmp folder if it does not exist
+	if not os.path.exists("tmp"): os.makedir("tmp")
+	# clear tmp folder
 	for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
 	if input=="all":
 		for levelname in os.listdir(LEVELS_DIR):
