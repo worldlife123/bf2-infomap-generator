@@ -22,6 +22,8 @@ TITANMODE_TITAN_TEAMPLATES = ["as_titan_playtest","eu_titan_playtest"]
 
 OUTPUT_SIZE = (478,341)
 
+BBOX_EXPAND_SCALE = 1.25
+
 DRAW_COVER = True
 
 DRAW_MINIMAP = False
@@ -228,13 +230,13 @@ def getBoundingBox(coords, imgsize, mapsize):
 		if coord[0]>right: right=coord[0]
 		if coord[1]<top: top=coord[1]
 		if coord[1]>bottom: bottom=coord[1]
-	#expand box to 1.25-scaled
-	size = [(right-left)*1.25, (bottom-top)*1.25]
+	#expand box to BBOX_EXPAND_SCALE-scaled
+	size = [(right-left)*BBOX_EXPAND_SCALE, (bottom-top)*BBOX_EXPAND_SCALE]
 	#expand to make w/h same as imgsize
 	if size[0]/size[1] < imgsize[0]/imgsize[1]: size = [size[1]*imgsize[0]/imgsize[1], size[1]]
 	else: size = [size[0], size[0]/imgsize[0]*imgsize[1]]
 	#if the combatarea is big enough, use the whole image
-	if size[0]>(imgsize[0]*0.8) and size[1]>(imgsize[1]*0.8): return 0,0,imgsize[0],imgsize[1]
+	if size[0]>(imgsize[0]/BBOX_EXPAND_SCALE) and size[1]>(imgsize[1]/BBOX_EXPAND_SCALE): return 0,0,imgsize[0],imgsize[1]
 	center = ((right+left)/2,(top+bottom)/2)
 	edgeDist = (min(center[0],imgsize[0]-center[0]), min(center[1],imgsize[1]-center[1]))
 	if size[0]>edgeDist[0]*2: size[0] = edgeDist[0]*2
@@ -406,59 +408,28 @@ def processLevel(level):
 	else:
 		print("Level %s not valid!" % level)
 		
-def getLevelChoice():
-	levelCnt = 0
-
-	for levelname in os.listdir(LEVELS_DIR): 
-		levelCnt = (levelCnt + 1);
-		print "<%d> %s" % (levelCnt, levelname);		
-
-	MaxLevelCnt = levelCnt;	
-	print ("<<0>> All listed maps")
-	print("Input the level number you want to generate info maps:")
-	input = raw_input();
-	levelNum = int(input)
-	while ( levelNum < 0 or levelNum > MaxLevelCnt):
-		print("Whoops!  Try again:");
-		input = raw_input();
-		levelNum = int(input);			
-	
-	if (levelNum == 0):
-		return "All";
-		
-	#process the listdir to get the level name
-	levelCnt = 0;
-	for levelname in os.listdir(LEVELS_DIR): 
-		levelCnt = (levelCnt + 1);
-		if (levelCnt == levelNum):
-			processLevel(levelname);
-		
-		
 def main():
-
-	if not os.path.isdir(LEVELS_DIR): 
-		print("No Levels folder detected! Check your installation!")
-		print("Hit any key end")
+	hasLevel = False
+	if not os.path.isdir(LEVELS_DIR): print("No Levels folder detected! Check your installation!")
+	for levelname in os.listdir(LEVELS_DIR): 
+		if not hasLevel:
+			hasLevel = True
+			print("Levels detected...")
+		print("--> %s" % levelname)
+	if not hasLevel: 
+		print("No level detected!")
 		os.system("pause")
-		return False;
-		
-	if not os.listdir(LEVELS_DIR):	
-		print("There are not levels in this directory!")
-		print("Hit any key end")
-		os.system("pause")
-		return False;
-		
-	levelName = getLevelChoice();
-
-	
+		return
+	print("Input the level name you want to generate info maps(input \"all\" to generate for all levels):")
+	input = raw_input()
 	#clear tmp folder
 	for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
-	if levelName=="ALL":
+	if input=="all":
 		for levelname in os.listdir(LEVELS_DIR):
 			processLevel(levelname)
 			for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
-
-
+	else:
+		processLevel(input)
 	os.system("pause")
 	
 if __name__ == "__main__":

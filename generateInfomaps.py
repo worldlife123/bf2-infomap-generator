@@ -15,6 +15,8 @@ MAPPATH_FLAGS_CP_IMGNAME = "miniMap_CP.tga"
 MAPPATH_FLAGS_CPBASE_IMGNAME = "utct.tga"#"miniMap_CPBase.tga"
 OUTPUT_SIZE = (1024,1024)
 
+BBOX_EXPAND_SCALE = 1.25
+
 DRAW_COVER = True
 
 DRAW_MINIMAP = True
@@ -168,13 +170,15 @@ def getBoundingBox(coords, imgsize, mapsize):
 		if coord[0]>right: right=coord[0]
 		if coord[1]<top: top=coord[1]
 		if coord[1]>bottom: bottom=coord[1]
-	#expand box to 1.25-scaled square
-	size = int(max(bottom-top,right-left) * 1.25)
+	#expand box to BBOX_EXPAND_SCALE-scaled square
+	size = int(max(bottom-top,right-left) * BBOX_EXPAND_SCALE)
 	#if the combatarea is big enough, use the whole image
-	if size>(imgsize*0.8): return 0,0,imgsize,imgsize
-	center = ((right+left)/2,(top+bottom)/2)
-	edgeDist = min(center[0],imgsize-center[0],center[1],imgsize-center[1])
-	if size>edgeDist*2: size = edgeDist*2
+	if size>(imgsize/BBOX_EXPAND_SCALE): return 0,0,imgsize,imgsize
+	center = [(right+left)/2,(top+bottom)/2]
+	edgeDist = (min(center[0],imgsize-center[0]),min(center[1],imgsize-center[1]))
+	# if the bbox reaches the edge, we try to adjust the center
+	if size>edgeDist[0]*2: center[0] = size/2
+	if size>edgeDist[1]*2: center[1] = size/2
 	return center[0]-size/2, center[1]-size/2, center[0]+size/2, center[1]+size/2
 
 def drawRect(dc, box, fill, width):
@@ -305,59 +309,28 @@ def processLevel(level):
 	else:
 		print("Level %s not valid!" % level)
 		
-def getLevelChoice():
-	levelCnt = 0
-
-	for levelname in os.listdir(LEVELS_DIR): 
-		levelCnt = (levelCnt + 1);
-		print "<%d> %s" % (levelCnt, levelname);		
-
-	MaxLevelCnt = levelCnt;	
-	print ("<<0>> All listed maps")
-	print("Input the level number you want to generate info maps:")
-	input = raw_input();
-	levelNum = int(input)
-	while ( levelNum < 0 or levelNum > MaxLevelCnt):
-		print("Whoops!  Try again:");
-		input = raw_input();
-		levelNum = int(input);			
-	
-	if (levelNum == 0):
-		return "All";
-		
-	#process the listdir to get the level name
-	levelCnt = 0;
-	for levelname in os.listdir(LEVELS_DIR): 
-		levelCnt = (levelCnt + 1);
-		if (levelCnt == levelNum):
-			processLevel(levelname);
-		
-		
 def main():
-
-	if not os.path.isdir(LEVELS_DIR): 
-		print("No Levels folder detected! Check your installation!")
-		print("Hit any key end")
+	hasLevel = False
+	if not os.path.isdir(LEVELS_DIR): print("No Levels folder detected! Check your installation!")
+	for levelname in os.listdir(LEVELS_DIR): 
+		if not hasLevel:
+			hasLevel = True
+			print("Levels detected...")
+		print("--> %s" % levelname)
+	if not hasLevel: 
+		print("No level detected!")
 		os.system("pause")
-		return False;
-		
-	if not os.listdir(LEVELS_DIR):	
-		print("There are not levels in this directory!")
-		print("Hit any key end")
-		os.system("pause")
-		return False;
-		
-	levelName = getLevelChoice();
-
-	
+		return
+	print("Input the level name you want to generate info maps(input \"all\" to generate for all levels):")
+	input = raw_input()
 	#clear tmp folder
 	for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
-	if levelName=="ALL":
+	if input=="all":
 		for levelname in os.listdir(LEVELS_DIR):
 			processLevel(levelname)
 			for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
-
-
+	else:
+		processLevel(input)
 	os.system("pause")
 	
 if __name__ == "__main__":
