@@ -1,4 +1,6 @@
-levels/
+.vscode
+levels
+tmp
 *.exe
 *.pyc
 *.txt

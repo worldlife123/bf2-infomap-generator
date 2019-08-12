@@ -245,11 +245,15 @@ def getBoundingBox(coords, imgsize, mapsize):
 	if size[0]/size[1] < imgsize[0]/imgsize[1]: size = [size[1]*imgsize[0]/imgsize[1], size[1]]
 	else: size = [size[0], size[0]/imgsize[0]*imgsize[1]]
 	#if the combatarea is big enough, use the whole image
-	if size[0]>(imgsize[0]/BBOX_EXPAND_SCALE) and size[1]>(imgsize[1]/BBOX_EXPAND_SCALE): return 0,0,imgsize[0],imgsize[1]
-	center = ((right+left)/2,(top+bottom)/2)
-	edgeDist = (min(center[0],imgsize[0]-center[0]), min(center[1],imgsize[1]-center[1]))
-	if size[0]>edgeDist[0]*2: size[0] = edgeDist[0]*2
-	if size[1]>edgeDist[1]*2: size[1] = edgeDist[1]*2
+	if size[0]>imgsize[0] or size[1]>imgsize[1]: return 0,0,imgsize[0],imgsize[1]
+	center = [(right+left)/2,(top+bottom)/2]
+	# edgeDist = (min(center[0],imgsize[0]-center[0]), min(center[1],imgsize[1]-center[1]))
+	# if size[0]>edgeDist[0]*2: size[0] = edgeDist[0]*2
+	# if size[1]>edgeDist[1]*2: size[1] = edgeDist[1]*2
+	if size>center[0]*2: center[0] = size/2
+	if size>(imgsize[0]-center[0])*2: center[0] = imgsize[0]-size/2
+	if size>center[1]*2: center[1] = size/2
+	if size>(imgsize[1]-center[1])*2: center[1] = imgsize[1]-size/2
 	#crop to make w/h same as imgsize(may not be neceesary)
 	'''if size[0]/size[1] < imgsize[0]/imgsize[1]: size = [size[0], size[0]/imgsize[0]*imgsize[1]]
 	else: size = [size[1]*imgsize[0]/imgsize[1], size[1]]'''

@@ -182,12 +182,16 @@ def getBoundingBox(coords, imgsize, mapsize):
 	#expand box to BBOX_EXPAND_SCALE-scaled square
 	size = int(max(bottom-top,right-left) * BBOX_EXPAND_SCALE)
 	#if the combatarea is big enough, use the whole image
-	if size>(imgsize/BBOX_EXPAND_SCALE): return 0,0,imgsize,imgsize
+	if size>imgsize: return 0,0,imgsize,imgsize
 	center = [(right+left)/2,(top+bottom)/2]
-	edgeDist = (min(center[0],imgsize-center[0]),min(center[1],imgsize-center[1]))
+	# edgeDist = (min(center[0],imgsize-center[0]),min(center[1],imgsize-center[1]))
 	# if the bbox reaches the edge, we try to adjust the center
-	if size>edgeDist[0]*2: center[0] = size/2
-	if size>edgeDist[1]*2: center[1] = size/2
+	# if size>edgeDist[0]*2: center[0] = size/2
+	# if size>edgeDist[1]*2: center[1] = size/2
+	if size>center[0]*2: center[0] = size/2
+	if size>(imgsize-center[0])*2: center[0] = imgsize-size/2
+	if size>center[1]*2: center[1] = size/2
+	if size>(imgsize-center[1])*2: center[1] = imgsize-size/2
 	return center[0]-size/2, center[1]-size/2, center[0]+size/2, center[1]+size/2
 
 def drawRect(dc, box, fill, width):
@@ -333,7 +337,7 @@ def main():
 	print("Input the level name you want to generate info maps(input \"all\" to generate for all levels):")
 	input = raw_input()
 	# create tmp folder if it does not exist
-	if not os.path.exists("tmp"): os.makedir("tmp")
+	if not os.path.exists("tmp"): os.mkdir("tmp")
 	# clear tmp folder
 	for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
 	if input=="all":
