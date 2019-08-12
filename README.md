@@ -1,23 +1,21 @@
 # [bf2-infomap-generator](https://github.com/worldlife123/bf2-infomap-generator)
-vBF2 style & BF2142 style info map generator by worldlife(worldlife123)
+vBF2 style & BF2142 style info map generater V1.1 by worldlife(worldlife123)
 
 This is a simple tool to generate vBF2 style and BF2142 style info images for your customized levels.
-
-Current version is V1.1.1.  
 
 ![Preview](preview.jpg)
 
 
 # Dependencies  
 
-BattleField 2/2142  
+BattleField 2/2142
 [Python 2.7.13](https://www.python.org/downloads/release/python-2713/)  
 [Pillow](https://github.com/python-pillow/Pillow)  
 [nvdxt.exe in NVIDIA DDS Utilities](https://developer.nvidia.com/legacy-texture-tools)
 
 # Install  
 
-1. Install [python 2.7.13](https://www.python.org/downloads/release/python-2713/) first. After installing python, you can run install_pillow.bat to install pillow via pip.  
+1. Install [python 2.7.13](https://www.python.org/downloads/release/python-2713/) first. Make sure to set the option "include python in the path" when installing. After installing python, you can run install_pillow.bat to install pillow via pip.  
 2. Create a new folder "infomap" into your mod's python folder, and copy everything into this folder. Note that this tool is not loaded in game, so after infomap generation you can delete the folder.   
 3. Copy nvdxt.exe to bin folder.  
 
@@ -48,4 +46,4 @@ Similar to 2. Just modify or replace CombatArea.dds in maps\areas.
 
 * NVIDIA - for nvdxt.exe  
 * fire&bf2tech.org - for conParser.py  
-* Dnamro - for testing this tool  
+* Dnamro, Deine-Augen - for testing this tool and giving feedbacks  
