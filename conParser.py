@@ -27,15 +27,15 @@ def readCon(conFile):
     # Open the file
     # ----------------------------------------------
     if g_debug:
-        print 'Reading CON file...'
+        print('Reading CON file...')
     
     try:
-        f = file(conFile, 'r')
+        f = open(conFile, 'r')
         lines = f.readlines()
         f.close()
     except IOError: # Damn..
         if g_debug:
-            print 'Error while reading CON file!!'
+            print('Error while reading CON file!!')
         
         return config
 
@@ -67,21 +67,21 @@ def readCon(conFile):
         # ---------------------------------------------- 
         pos = line.find(' ')
         if pos < 0: # Not found :(
-			key = line
-			values = []
-			#modified by worldlife in order to get "endIf" command
+            key = line
+            values = []
+            #modified by worldlife in order to get "endIf" command
         # ----------------------------------------------
         # Get the key
         # ---------------------------------------------- 
         else: 
-			key = line[:pos]
+            key = line[:pos]
 
-			# ----------------------------------------------
-			# Get the values
-			# ---------------------------------------------- 
-			values = line[pos + 1:].split(' ')
-			for value in values:
-				value = value.strip(' ')
+            # ----------------------------------------------
+            # Get the values
+            # ---------------------------------------------- 
+            values = line[pos + 1:].split(' ')
+            for value in values:
+                value = value.strip(' ')
 
         config.append({key: values})
 
@@ -100,10 +100,10 @@ def writeCon(config, conFile):
     # Open the file
     # ----------------------------------------------
     if g_debug:
-        print 'Writing CON file...'
+        print('Writing CON file...')
     
     try:
-        f = file(conFile, 'w+')
+        f = open(conFile, 'w+')
         pass
     except IOError: # Damn..
         return False
@@ -136,7 +136,7 @@ def writeCon(config, conFile):
         f.close()
     except IOError:
         if g_debug:
-            print 'Error while writing CON file!!'
+            print('Error while writing CON file!!')
         return False
     else:
         return True

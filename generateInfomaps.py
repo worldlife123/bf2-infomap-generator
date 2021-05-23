@@ -60,10 +60,11 @@ class ControlPointInfo:
 def findLevelInfo(levelpath):
 	levelinfo = LevelInfo(os.path.split(levelpath)[-1])
 	initcons = conParser.readCon(os.path.join(levelpath,"init.con"))
+	print(initcons)
 	heightcons = conParser.readCon(os.path.join(levelpath,"Heightdata.con"))
 	for con in initcons:
 		if con.get('gameLogic.setTeamName'):
-			if con['gameLogic.setTeamName'][0]>0: levelinfo.teamnames[int(con['gameLogic.setTeamName'][0])] = con['gameLogic.setTeamName'][1].strip("\"")
+			if int(con['gameLogic.setTeamName'][0])>0: levelinfo.teamnames[int(con['gameLogic.setTeamName'][0])] = con['gameLogic.setTeamName'][1].strip("\"")
 	for con in heightcons:
 		if con.get('heightmapcluster.setHeightmapSize'):
 			levelinfo.mapsize = int(con['heightmapcluster.setHeightmapSize'][0])
@@ -256,7 +257,7 @@ def parseCon(levelinfo, gamemode, playernum):
 		newCanvas = Image.new('RGBA', img.size, (255,255,255,0))
 		drawmap = cpmaps[cp.team] #if cp.utct==0 else cpbasemaps[cp.team]
 		cpPos = convertCoordCropped(cp.position, baseSize, levelinfo.mapsize, caBox)
-		drawPos = (cpPos[0]-drawmap.size[0]/2,cpPos[1]-drawmap.size[1]/2) #draw at center
+		drawPos = (int(cpPos[0]-drawmap.size[0]/2), int(cpPos[1]-drawmap.size[1]/2)) #draw at center
 		if cp.utct!=0: 
 			drawmap = Image.alpha_composite(cpbasemap,drawmap)#cpCanvas.paste(cpbasemap,drawPos)
 		newCanvas.paste(drawmap,drawPos)	
@@ -335,17 +336,20 @@ def main():
 		os.system("pause")
 		return
 	print("Input the level name you want to generate info maps(input \"all\" to generate for all levels):")
-	input = raw_input()
+	if sys.version_info[0] >= 3:
+		input_str = input()
+	else:
+		input_str = raw_input()
 	# create tmp folder if it does not exist
 	if not os.path.exists("tmp"): os.mkdir("tmp")
 	# clear tmp folder
 	for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
-	if input=="all":
+	if input_str=="all":
 		for levelname in os.listdir(LEVELS_DIR):
 			processLevel(levelname)
 			for file in os.listdir("tmp"): os.remove("\\".join(("tmp",file)))
 	else:
-		processLevel(input)
+		processLevel(input_str)
 	os.system("pause")
 	
 if __name__ == "__main__":
